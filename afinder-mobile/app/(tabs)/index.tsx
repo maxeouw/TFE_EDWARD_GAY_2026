@@ -1,7 +1,14 @@
 // app/(tabs)/index.tsx
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import * as Location from "expo-location";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 type Event = {
@@ -13,7 +20,7 @@ type Event = {
 
 function EventCard({ event }: { event: Event }) {
   return (
-    <TouchableOpacity activeOpacity={0.9} style={styles.card}>
+    <View style={styles.card}>
       <View style={styles.cardHeader}>
         <Text style={styles.badge}>{event.sport}</Text>
         <View style={styles.distanceRow}>
@@ -25,31 +32,14 @@ function EventCard({ event }: { event: Event }) {
       <Text style={styles.eventTitle} numberOfLines={1}>
         {event.title}
       </Text>
-
-      {event.date && (
-        <Text style={styles.dateText}>
-          {event.date} • {event.time}
-        </Text>
-      )}
-
-      <View style={styles.cardFooter}>
-        <View style={styles.slotsRow}>
-          <Ionicons name="people-outline" size={16} color="#4B5563" />
-          <Text style={styles.slotsText}>
-            {event.remainingSlots}/{event.totalSlots} places
-          </Text>
-        </View>
-        <Text style={styles.ctaText}>Voir les détails</Text>
-      </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
 export default function HomeScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -60,9 +50,7 @@ export default function HomeScreen() {
         return;
       }
 
-      const loc = await Location.getCurrentPositionAsync({});
-      setLocation(loc);
-
+      await Location.getCurrentPositionAsync({});
 
       const mockEvents: Event[] = [
         { id: "1", title: "Match de foot 5v5", sport: "Football", distanceKm: 1.2 },
@@ -75,40 +63,47 @@ export default function HomeScreen() {
     })();
   }, []);
 
-  if (loading) {
+  if (loading || errorMsg) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator />
-        <Text>Chargement des événements...</Text>
-      </View>
-    );
-  }
-
-  if (errorMsg) {
-    return (
-      <View style={styles.center}>
-        <Text>{errorMsg}</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+        <View style={styles.center}>
+          {loading && <ActivityIndicator />}
+          {errorMsg && <Text>{errorMsg}</Text>}
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Événements près de chez toi</Text>
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Événements près de chez toi</Text>
 
-      <FlatList
-        data={events}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <EventCard event={item} />}
-        contentContainerStyle={{ paddingBottom: 24 }}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+        <FlatList
+          data={events}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <EventCard event={item} />}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 60, paddingHorizontal: 16, backgroundColor: "#F3F4F6" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F3F4F6",
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    backgroundColor: "#F3F4F6",
+  },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+
   title: { fontSize: 24, fontWeight: "700", marginBottom: 16, color: "#111827" },
 
   card: {
@@ -122,7 +117,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -140,17 +134,5 @@ const styles = StyleSheet.create({
   },
   distanceRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   distanceText: { fontSize: 12, color: "#4B5563" },
-
-  eventTitle: { fontSize: 16, fontWeight: "700", color: "#111827", marginBottom: 4 },
-  dateText: { fontSize: 13, color: "#6B7280", marginBottom: 10 },
-
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  slotsRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  slotsText: { fontSize: 13, color: "#4B5563" },
-  ctaText: { fontSize: 13, color: "#2563EB", fontWeight: "600" },
+  eventTitle: { fontSize: 16, fontWeight: "700", color: "#111827" },
 });
