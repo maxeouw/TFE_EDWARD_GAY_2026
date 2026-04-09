@@ -6,10 +6,13 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 type Event = {
   id: string;
@@ -18,6 +21,39 @@ type Event = {
   distanceKm: number;
 };
 
+// TODO: remplacer par l'URL de ta vraie photo Firebase Auth
+const PROFILE_PHOTO_URL =
+  "https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=facearea&w=256&h=256&q=80";
+
+function HomeHeader() {
+  const router = useRouter();
+
+  return (
+    <View style={styles.header}>
+      {/* Avatar cliquable → profil */}
+      <TouchableOpacity
+        onPress={() => router.push("/(tabs)/profile")}
+        activeOpacity={0.8}
+        style={styles.avatarButton}
+      >
+        <Image source={{ uri: PROFILE_PHOTO_URL }} style={styles.avatar} />
+      </TouchableOpacity>
+
+      {/* Titre centré */}
+      <Text style={styles.headerTitle}>Afinder</Text>
+
+      {/* Loupe cliquable → future page recherche */}
+      <TouchableOpacity
+        onPress={() => router.push("/search")}
+        activeOpacity={0.8}
+        style={styles.searchButton}
+      >
+        <Ionicons name="search-outline" size={24} color="#111827" />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 function EventCard({ event }: { event: Event }) {
   return (
     <View style={styles.card}>
@@ -25,7 +61,9 @@ function EventCard({ event }: { event: Event }) {
         <Text style={styles.badge}>{event.sport}</Text>
         <View style={styles.distanceRow}>
           <Ionicons name="location-outline" size={14} color="#4B5563" />
-          <Text style={styles.distanceText}>{event.distanceKm.toFixed(1)} km</Text>
+          <Text style={styles.distanceText}>
+            {event.distanceKm.toFixed(1)} km
+          </Text>
         </View>
       </View>
 
@@ -77,7 +115,9 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <View style={styles.container}>
-        <Text style={styles.title}>Événements près de chez toi</Text>
+        <HomeHeader />
+
+        <Text style={styles.sectionTitle}>Événements près de chez toi</Text>
 
         <FlatList
           data={events}
@@ -99,13 +139,52 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 8,
     backgroundColor: "#F3F4F6",
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 16, color: "#111827" },
+  // Header
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    marginTop: 4,
+  },
+  avatarButton: {
+    width: 40,
+    height: 40,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#E5E7EB",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111827",
+    letterSpacing: 0.5,
+  },
+  searchButton: {
+    width: 40,
+    height: 40,
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
 
+  // Section
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    color: "#374151",
+  },
+
+  // Cards
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,

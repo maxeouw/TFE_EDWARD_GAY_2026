@@ -14,9 +14,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        // force a blue color for the active icon (clicked state)
         tabBarActiveTintColor: Colors.light.tabIconSelected,
-        // optional: set the inactive icons to a gray tone
         tabBarInactiveTintColor: Colors.light.tabIconDefault,
         tabBarButton: HapticTab,
         tabBarSafeAreaInsets: { bottom: 0 },
