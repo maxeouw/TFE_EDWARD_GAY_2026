@@ -14,6 +14,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        sceneStyle: { backgroundColor: "transparent" },
         tabBarActiveTintColor: Colors.light.tabIconSelected,
         tabBarInactiveTintColor: Colors.light.tabIconDefault,
         tabBarButton: HapticTab,

@@ -1,12 +1,12 @@
 // app/(tabs)/map.tsx
 import React from "react";
+import { View, StyleSheet } from "react-native";
 import MapScreen from "../../components/map-screen";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MapPage() {
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["bottom"]}>
+    <View style={{ flex: 1, backgroundColor: "black" }}>
       <MapScreen />
-    </SafeAreaView>
+    </View>
   );
 }

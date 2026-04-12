@@ -155,7 +155,7 @@ export default function SearchScreen() {
   const listData = grouped ?? results;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
       {/* ── Barre de recherche + retour ── */}
       <View style={styles.searchBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
